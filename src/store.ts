@@ -152,7 +152,7 @@ function buildCoverageRequest(p: SplatParams): CoverageRequest {
 
 /** Fresh factory-default site parameters (new object each call so callers
  * never share nested references; the site name is randomized per call).
- * Colombia fork: defaults adjusted for ANZ LongFast (916 MHz), 1 W max power,
+ * Colombia fork: defaults adjusted for ANZ LongFast (919.875 MHz), 1 W max power,
  * equatorial climate, Bogota as starting coordinate. */
 function defaultParams(): SplatParams {
   return {
@@ -161,7 +161,7 @@ function defaultParams(): SplatParams {
       tx_lat: 4.60971,   // Colombia fork: Bogota default
       tx_lon: -74.08175, // Colombia fork: Bogota default
       tx_power: 1.0,     // Colombia fork: 1 W = 30 dBm (tope ANZ)
-      tx_freq: 916.0,    // Colombia fork: ANZ LongFast (corrige 907 MHz de EE.UU.)
+      tx_freq: 919.875,  // Colombia fork: ANZ LongFast slot 20 (915.0 + 0.125 + 19*0.25 = 919.875 MHz)
       tx_height: 2.0,
       tx_gain: 2.0,
     },

@@ -52,7 +52,7 @@
         <div class="text-sm">
           <p class="font-semibold text-ink">Planifica tu primer sitio Meshtastic</p>
           <p class="mt-0.5 text-ink-muted">Arrastra el pin verde o usa "Colocar en mapa" para ubicar tu antena. Ingresa la altura y ganancia, luego presiona <span class="text-ink">Calcular cobertura</span>.</p>
-          <p class="mt-1 text-ink-muted text-xs">Los parametros tecnicos ya estan configurados para Colombia (ANZ LongFast 916 MHz).</p>
+          <p class="mt-1 text-ink-muted text-xs">Los parametros tecnicos ya estan configurados para Colombia (ANZ LongFast 919.875 MHz).</p>
         </div>
         <button type="button" class="shrink-0 text-ink-muted hover:text-ink" aria-label="Cerrar ayuda" @click="dismissOnboarding">
           <svg viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
@@ -72,7 +72,7 @@
       <!-- Colombia fork: seccion colapsable con parametros prefijados para Colombia ANZ -->
       <Section title="Avanzado (Colombia ANZ prefijado)">
         <p class="mt-hint mb-3 text-xs">
-          Estos parametros ya estan optimizados para Colombia (ANZ LongFast 916 MHz, clima ecuatorial).
+          Estos parametros ya estan optimizados para Colombia (ANZ LongFast 919.875 MHz, clima ecuatorial).
           Solo modificalos si sabes lo que haces.
         </p>
         <Section title="Receptor"><Receiver /></Section>
