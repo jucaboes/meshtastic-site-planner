@@ -90,7 +90,8 @@ function getTerrain(): TerrainService {
 
 /** Map popup DOM for a simulated site: parameters + georeferenced export
  * buttons (#64). Built as a DOM element so the export buttons can be wired
- * directly. */
+ * directly.
+ * Colombia fork: strings translated to Spanish. */
 function buildSitePopup(site: Site): HTMLElement {
   const t = site.params.transmitter;
   const s = site.stats;
@@ -101,15 +102,15 @@ function buildSitePopup(site: Site): HTMLElement {
   el.className = 'mt-popup';
   el.innerHTML = `
     <div class="mt-popup-title">${esc(t.name)}</div>
-    <div class="mt-popup-row"><span>Frequency</span><span>${t.tx_freq} MHz</span></div>
-    <div class="mt-popup-row"><span>Power</span><span>${t.tx_power} W</span></div>
-    <div class="mt-popup-row"><span>Antenna height</span><span>${t.tx_height} m</span></div>
-    <div class="mt-popup-row"><span>Plot radius</span><span>${site.params.simulation.simulation_extent} km</span></div>
-    <div class="mt-popup-row"><span>Coverage (≥ ${s.thresholdDbm} dBm)</span><span>${km2} km²</span></div>
-    <div class="mt-popup-row"><span>Max usable range</span><span>${s.maxRangeKm.toFixed(1)} km</span></div>
-    <div class="mt-popup-row"><span>Disk covered</span><span>${Math.round(s.coveredFraction * 100)}%</span></div>
+    <div class="mt-popup-row"><span>Frecuencia</span><span>${t.tx_freq} MHz</span></div>
+    <div class="mt-popup-row"><span>Potencia</span><span>${t.tx_power} W</span></div>
+    <div class="mt-popup-row"><span>Altura antena</span><span>${t.tx_height} m</span></div>
+    <div class="mt-popup-row"><span>Radio simulado</span><span>${site.params.simulation.simulation_extent} km</span></div>
+    <div class="mt-popup-row"><span>Cobertura (≥ ${s.thresholdDbm} dBm)</span><span>${km2} km²</span></div>
+    <div class="mt-popup-row"><span>Alcance maximo util</span><span>${s.maxRangeKm.toFixed(1)} km</span></div>
+    <div class="mt-popup-row"><span>Area cubierta</span><span>${Math.round(s.coveredFraction * 100)}%</span></div>
     <div class="mt-popup-export">
-      <span>Export</span>
+      <span>Exportar</span>
       <button type="button" data-fmt="geojson">GeoJSON</button>
       <button type="button" data-fmt="png">PNG</button>
       <button type="button" data-fmt="kml">KML</button>
@@ -150,21 +151,28 @@ function buildCoverageRequest(p: SplatParams): CoverageRequest {
 }
 
 /** Fresh factory-default site parameters (new object each call so callers
- * never share nested references; the site name is randomized per call). */
+ * never share nested references; the site name is randomized per call).
+ * Colombia fork: defaults adjusted for ANZ LongFast (916 MHz), 1 W max power,
+ * equatorial climate, Bogota as starting coordinate. */
 function defaultParams(): SplatParams {
   return {
     transmitter: {
       name: randanimalSync(),
-      tx_lat: 51.102167,
-      tx_lon: -114.098667,
-      tx_power: 0.1,
-      tx_freq: 907.0,
+      tx_lat: 4.60971,   // Colombia fork: Bogota default
+      tx_lon: -74.08175, // Colombia fork: Bogota default
+      tx_power: 1.0,     // Colombia fork: 1 W = 30 dBm (tope ANZ)
+      tx_freq: 916.0,    // Colombia fork: ANZ LongFast (corrige 907 MHz de EE.UU.)
       tx_height: 2.0,
       tx_gain: 2.0,
     },
-    receiver: { rx_sensitivity: -130.0, rx_height: 1.0, rx_gain: 2.0, rx_loss: 2.0 },
+    receiver: {
+      rx_sensitivity: -130.0,
+      rx_height: 1.0,
+      rx_gain: 2.15, // Colombia fork: ganancia isotrópica dipolo simple
+      rx_loss: 2.0,
+    },
     environment: {
-      radio_climate: 'continental_temperate',
+      radio_climate: 'equatorial', // Colombia fork: tropical, corrige continental_temperate
       polarization: 'vertical',
       clutter_height: 1.0,
       ground_dielectric: 15.0,
@@ -174,7 +182,7 @@ function defaultParams(): SplatParams {
     simulation: {
       situation_fraction: 95.0,
       time_fraction: 95.0,
-      simulation_extent: 30.0,
+      simulation_extent: 30.0, // Colombia fork: 30 km prefijado
       high_resolution: false,
     },
     display: { color_scale: 'plasma', min_dbm: -130.0, max_dbm: -80.0, overlay_transparency: 50 },

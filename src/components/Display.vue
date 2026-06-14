@@ -1,14 +1,15 @@
+<!-- Colombia fork: etiquetas de visualizacion en espanol -->
 <template>
   <div>
-    <label class="mt-label">Overlay style</label>
-    <div class="mb-3 flex w-full overflow-hidden rounded-lg border border-line" role="group" aria-label="Overlay style">
+    <label class="mt-label">Estilo de visualizacion</label>
+    <div class="mb-3 flex w-full overflow-hidden rounded-lg border border-line" role="group" aria-label="Estilo de visualizacion">
       <button
         type="button"
         class="flex-1 py-2 text-sm font-semibold transition"
         :class="store.overlayStyle === 'heatmap' ? 'bg-primary text-on-primary' : 'bg-surface-2 text-ink hover:bg-surface-3'"
         @click="store.setOverlayStyle('heatmap')"
       >
-        Heatmap
+        Mapa de calor
       </button>
       <button
         type="button"
@@ -16,24 +17,24 @@
         :class="store.overlayStyle === 'contours' ? 'bg-primary text-on-primary' : 'bg-surface-2 text-ink hover:bg-surface-3'"
         @click="store.setOverlayStyle('contours')"
       >
-        Contours
+        Curvas de nivel
       </button>
     </div>
 
     <div class="grid grid-cols-2 gap-2">
       <div>
-        <label for="min_dbm" class="mt-label">Minimum dBm</label>
+        <label for="min_dbm" class="mt-label">dBm minimo</label>
         <input v-model="display.min_dbm" type="number" class="mt-input" id="min_dbm" step="0.1" />
       </div>
       <div>
-        <label for="max_dbm" class="mt-label">Maximum dBm</label>
+        <label for="max_dbm" class="mt-label">dBm maximo</label>
         <input v-model="display.max_dbm" type="number" class="mt-input" id="max_dbm" step="0.1" />
       </div>
       <div>
-        <label for="color_scale" class="mt-label">Color Scale</label>
+        <label for="color_scale" class="mt-label">Escala de color</label>
         <select v-model="display.color_scale" id="color_scale" class="mt-select">
           <option value="plasma">Plasma</option>
-          <option value="viridis">Viridis (colorblind-safe)</option>
+          <option value="viridis">Viridis (apto daltones)</option>
           <option value="CMRmap">CMR map</option>
           <option value="cool">Cool</option>
           <option value="turbo">Turbo</option>
@@ -41,14 +42,14 @@
         </select>
       </div>
       <div>
-        <label for="overlay_transparency" class="mt-label">Transparency (%)</label>
+        <label for="overlay_transparency" class="mt-label">Transparencia (%)</label>
         <input v-model="display.overlay_transparency" type="number" class="mt-input" id="overlay_transparency" min="0" max="100" step="1" />
       </div>
     </div>
 
-    <p class="mt-hint mt-3 mb-1">Changes apply instantly to existing coverage.</p>
+    <p class="mt-hint mt-3 mb-1">Los cambios se aplican de inmediato a la cobertura existente.</p>
     <div class="mt-1">
-      <img :src="colorbarSrc" alt="Color scale preview" class="mt-colorbar" />
+      <img :src="colorbarSrc" alt="Vista previa de escala de color" class="mt-colorbar" />
       <div class="mt-1 flex justify-between">
         <span class="mt-legend-label">{{ display.min_dbm }} dBm</span>
         <span class="mt-legend-label">{{ display.max_dbm }} dBm</span>

@@ -8,12 +8,13 @@
     :aria-hidden="!modelValue"
     aria-label="Site parameters"
   >
+    <!-- Colombia fork: aria-label en espanol -->
     <header class="flex items-center justify-between border-b border-line px-4 py-3">
       <h2 class="m-0 text-base font-bold text-ink">{{ title }}</h2>
       <button
         type="button"
         class="grid size-8 place-items-center rounded-lg text-ink-muted transition hover:bg-surface-2 hover:text-ink"
-        aria-label="Close panel"
+        aria-label="Cerrar panel"
         @click="emit('update:modelValue', false)"
       >
         <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">

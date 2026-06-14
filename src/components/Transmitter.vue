@@ -1,44 +1,79 @@
+<!-- Colombia fork: simplified to 3 visible fields (GMS coords, height, gain).
+     All other transmitter parameters are prefixed with Colombia ANZ defaults
+     and hidden in the "Avanzado" collapsible section of App.vue. -->
 <template>
   <div>
-    <p class="mt-hint mb-3">The radio whose coverage is simulated.</p>
-    <div class="grid grid-cols-2 gap-2">
-      <div class="col-span-2">
-        <label for="name" class="mt-label">Site name</label>
-        <input v-model="transmitter.name" class="mt-input" id="name" title="Site name" />
-      </div>
-      <div>
-        <label for="tx_lat" class="mt-label">Latitude (degrees)</label>
-        <input v-model="transmitter.tx_lat" type="number" class="mt-input" id="tx_lat" min="-90" max="90" step="0.000001" title="Transmitter latitude in degrees (-90 to 90)." />
-      </div>
-      <div>
-        <label for="tx_lon" class="mt-label">Longitude (degrees)</label>
-        <input v-model="transmitter.tx_lon" type="number" class="mt-input" id="tx_lon" min="-180" max="180" step="0.000001" title="Transmitter longitude in degrees (-180 to 180)." />
-      </div>
-      <div class="col-span-2">
-        <label for="device" class="mt-label">Device (optional)</label>
-        <select v-model="selectedDevice" @change="applyDevice" class="mt-select" id="device" title="Prefill power and stock-antenna gain from a common Meshtastic device.">
-          <option value="">Custom / manual</option>
-          <option v-for="(d, i) in DEVICE_PROFILES" :key="i" :value="i">{{ d.label }}</option>
-        </select>
-        <p class="mt-hint mt-1">Fills typical power &amp; stock-antenna gain. Tune for your antenna and region.</p>
-      </div>
-      <div>
-        <label for="tx_power" class="mt-label">Power (W)</label>
-        <input v-model="transmitter.tx_power" type="number" class="mt-input" id="tx_power" min="0" step="0.1" title="Transmitter power in watts (>0)." />
-      </div>
-      <div>
-        <label for="tx_freq" class="mt-label">Frequency (MHz)</label>
-        <input v-model="transmitter.tx_freq" type="number" class="mt-input" id="tx_freq" min="20" max="20000" step="0.1" title="Transmitter frequency in MHz (20 to 20,000)." />
-      </div>
-      <div>
-        <label for="tx_height" class="mt-label">Height AGL (m)</label>
-        <input v-model="transmitter.tx_height" type="number" class="mt-input" id="tx_height" min="1.0" step="0.1" title="Transmitter height above ground in meters (>= 1.0)." />
-      </div>
-      <div>
-        <label for="tx_gain" class="mt-label">Antenna Gain (dBi)</label>
-        <input v-model="transmitter.tx_gain" type="number" class="mt-input" id="tx_gain" min="0" step="0.1" />
-      </div>
+    <p class="mt-hint mb-3">La radio cuya cobertura se simula. Ingresa la ubicacion de tu antena.</p>
+
+    <!-- Campo 1: Nombre del sitio -->
+    <div class="mb-2">
+      <label for="name" class="mt-label">Nombre del sitio</label>
+      <input v-model="transmitter.name" class="mt-input" id="name" title="Nombre del sitio" />
     </div>
+
+    <!-- Campo 2: Ubicacion en grados/minutos/segundos (GMS) -->
+    <!-- Colombia fork: GMS input — convierte internamente a decimal en tx_lat/tx_lon -->
+    <div class="mb-3">
+      <p class="mt-label mb-1">Ubicacion (Grados / Minutos / Segundos)</p>
+      <p class="mt-hint mb-2">Ingresa las coordenadas o haz clic en "Colocar en mapa".</p>
+
+      <!-- Latitud GMS -->
+      <div class="mb-2">
+        <label class="mt-label text-xs">Latitud</label>
+        <div class="flex items-center gap-1">
+          <input v-model.number="lat_deg" type="number" class="mt-input w-16 text-center" min="0" max="90" step="1" placeholder="°" title="Grados de latitud (0-90)" />
+          <span class="text-ink-muted text-sm">°</span>
+          <input v-model.number="lat_min" type="number" class="mt-input w-16 text-center" min="0" max="59" step="1" placeholder="'" title="Minutos (0-59)" />
+          <span class="text-ink-muted text-sm">'</span>
+          <input v-model.number="lat_sec" type="number" class="mt-input w-20 text-center" min="0" max="59.999" step="0.1" placeholder="''" title="Segundos (0-59.9)" />
+          <span class="text-ink-muted text-sm">''</span>
+          <select v-model="lat_hemi" class="mt-select w-16 text-center" title="Hemisferio Norte o Sur">
+            <option value="N">N</option>
+            <option value="S">S</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Longitud GMS -->
+      <div class="mb-2">
+        <label class="mt-label text-xs">Longitud</label>
+        <div class="flex items-center gap-1">
+          <input v-model.number="lon_deg" type="number" class="mt-input w-16 text-center" min="0" max="180" step="1" placeholder="°" title="Grados de longitud (0-180)" />
+          <span class="text-ink-muted text-sm">°</span>
+          <input v-model.number="lon_min" type="number" class="mt-input w-16 text-center" min="0" max="59" step="1" placeholder="'" title="Minutos (0-59)" />
+          <span class="text-ink-muted text-sm">'</span>
+          <input v-model.number="lon_sec" type="number" class="mt-input w-20 text-center" min="0" max="59.999" step="0.1" placeholder="''" title="Segundos (0-59.9)" />
+          <span class="text-ink-muted text-sm">''</span>
+          <select v-model="lon_hemi" class="mt-select w-16 text-center" title="Este u Oeste">
+            <option value="W">O</option>
+            <option value="E">E</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Decimal de referencia (solo lectura, refleja lo que hay en tx_lat/tx_lon) -->
+      <p class="mt-hint text-xs tabular-nums">
+        Decimal: {{ transmitter.tx_lat.toFixed(6) }}, {{ transmitter.tx_lon.toFixed(6) }}
+      </p>
+    </div>
+
+    <!-- Campo 3: Altura sobre el suelo (AGL) -->
+    <div class="mb-2">
+      <label for="tx_height" class="mt-label">Altura sobre el suelo (m)</label>
+      <input v-model="transmitter.tx_height" type="number" class="mt-input" id="tx_height" min="1.0" step="0.1"
+        title="Altura de la antena sobre el suelo en metros (minimo 1.0 m)." />
+      <p class="mt-hint mt-1">Ejemplo: 6 m para una antena en techo de casa, 30 m para una torre.</p>
+    </div>
+
+    <!-- Campo 4: Ganancia de la antena -->
+    <div class="mb-3">
+      <label for="tx_gain" class="mt-label">Ganancia de la antena (dBi)</label>
+      <input v-model="transmitter.tx_gain" type="number" class="mt-input" id="tx_gain" min="0" step="0.1"
+        title="Ganancia de la antena en dBi. La antena de fabrica de Meshtastic es ~2 dBi." />
+      <p class="mt-hint mt-1">Antena de fabrica ~2 dBi. Antenas externas de buena calidad: 5-8 dBi.</p>
+    </div>
+
+    <!-- Botones de accion -->
     <div class="mt-3 flex gap-2">
       <button
         @click="store.beginPlaceOnMap()"
@@ -46,75 +81,106 @@
         id="setWithMap"
         class="mt-btn mt-btn-sm flex-1 whitespace-nowrap"
         :class="store.placingMode ? 'mt-btn-secondary' : 'mt-btn-primary'"
+        title="Haz clic en el mapa para colocar la antena"
       >
-        {{ store.placingMode ? 'Click the map…' : 'Place on map' }}
+        {{ store.placingMode ? 'Haz clic en el mapa…' : 'Colocar en mapa' }}
       </button>
       <button @click="centerMapOnTransmitter" type="button" class="mt-btn mt-btn-secondary mt-btn-sm flex-1 whitespace-nowrap">
-        Center on site
+        Centrar en sitio
       </button>
     </div>
-    <div class="mt-2 flex items-end gap-2">
-      <div class="w-24">
-        <label for="hp_radius" class="mt-label">Search km</label>
-        <input id="hp_radius" v-model.number="hpRadius" type="number" min="0.2" max="10" step="0.5" class="mt-input" title="Radius to search for higher ground." />
-      </div>
-      <button
-        type="button"
-        class="mt-btn mt-btn-secondary mt-btn-sm flex-1 whitespace-nowrap"
-        :disabled="store.highpointBusy"
-        title="Move the transmitter to the highest ground nearby."
-        @click="store.findHighpoint(hpRadius)"
-      >
-        <span v-if="store.highpointBusy" class="mt-spinner" aria-hidden="true"></span>
-        {{ store.highpointBusy ? 'Searching…' : 'Snap to highest point' }}
-      </button>
-    </div>
+
     <p v-if="store.highpointMessage" class="mt-hint mt-1">{{ store.highpointMessage }}</p>
-    <p class="mt-hint mt-2">Tip: drag the green pin to fine-tune, or type coordinates above.</p>
+    <p class="mt-hint mt-2">Tip: arrastra el pin verde en el mapa para ajustar la posicion.</p>
   </div>
 </template>
 
 <script setup lang="ts">
+// Colombia fork: GMS <-> decimal conversion; tx_power/tx_freq hidden (prefijados).
 import { useStore } from '../store.ts';
 import { onMounted, watch, ref } from 'vue';
-import { DEVICE_PROFILES } from '../deviceProfiles';
+
 const store = useStore();
 const transmitter = store.splatParams.transmitter;
 
-// Find-highpoint (#39) search radius, km.
-const hpRadius = ref(1);
-
-// Optional device quick-fill (#51): selecting a radio prefills power + gain.
-const selectedDevice = ref<number | ''>('');
-function applyDevice() {
-  if (selectedDevice.value === '') return;
-  const d = DEVICE_PROFILES[selectedDevice.value as number];
-  if (!d) return;
-  transmitter.tx_power = d.tx_power;
-  transmitter.tx_gain = d.tx_gain;
+// --- GMS state (reactive) ---
+// Initialized from the current decimal values (defaults = Bogota).
+function decimalToGms(decimal: number): { deg: number; min: number; sec: number } {
+  const abs = Math.abs(decimal);
+  const deg = Math.floor(abs);
+  const minFull = (abs - deg) * 60;
+  const min = Math.floor(minFull);
+  const sec = parseFloat(((minFull - min) * 60).toFixed(2));
+  return { deg, min, sec };
 }
 
-// If power or gain is hand-edited away from the chosen device, fall back to
-// "Custom" so the dropdown never misrepresents the current values.
+function gmsToDecimal(deg: number, min: number, sec: number, hemi: 'N' | 'S' | 'E' | 'W'): number {
+  const abs = deg + min / 60 + sec / 3600;
+  return (hemi === 'S' || hemi === 'W') ? -abs : abs;
+}
+
+const initLat = decimalToGms(transmitter.tx_lat);
+const initLon = decimalToGms(transmitter.tx_lon);
+
+const lat_deg = ref(initLat.deg);
+const lat_min = ref(initLat.min);
+const lat_sec = ref(initLat.sec);
+const lat_hemi = ref<'N' | 'S'>(transmitter.tx_lat >= 0 ? 'N' : 'S');
+
+const lon_deg = ref(initLon.deg);
+const lon_min = ref(initLon.min);
+const lon_sec = ref(initLon.sec);
+// Colombia is west of Greenwich; default O (West)
+const lon_hemi = ref<'E' | 'W'>(transmitter.tx_lon <= 0 ? 'W' : 'E');
+
+// --- GMS -> decimal write-through ---
+// When the user edits any GMS field, recalculate tx_lat / tx_lon immediately.
 watch(
-  () => [Number(transmitter.tx_power), Number(transmitter.tx_gain)] as const,
-  ([p, g]) => {
-    if (selectedDevice.value === '') return;
-    const d = DEVICE_PROFILES[selectedDevice.value as number];
-    if (d && (p !== d.tx_power || g !== d.tx_gain)) selectedDevice.value = '';
+  () => [lat_deg.value, lat_min.value, lat_sec.value, lat_hemi.value] as const,
+  ([d, m, s, h]) => {
+    if (!Number.isFinite(d) || !Number.isFinite(m) || !Number.isFinite(s)) return;
+    const dec = gmsToDecimal(d, m, s, h);
+    if (dec < -90 || dec > 90) return;
+    transmitter.tx_lat = parseFloat(dec.toFixed(6));
   }
 );
 
-const centerMapOnTransmitter = () => {
-  if (!isNaN(transmitter.tx_lat) && !isNaN(transmitter.tx_lon)) {
-    store.getMap()?.flyTo({ center: [transmitter.tx_lon, transmitter.tx_lat] });
-  } else {
-    alert('Please enter valid Latitude and Longitude values.');
+watch(
+  () => [lon_deg.value, lon_min.value, lon_sec.value, lon_hemi.value] as const,
+  ([d, m, s, h]) => {
+    if (!Number.isFinite(d) || !Number.isFinite(m) || !Number.isFinite(s)) return;
+    const dec = gmsToDecimal(d, m, s, h);
+    if (dec < -180 || dec > 180) return;
+    transmitter.tx_lon = parseFloat(dec.toFixed(6));
   }
-};
+);
 
-// Typing coordinates moves (or creates) the draggable draft pin, so the
-// text fields and the map marker always agree. Skipped mid-simulation.
+// --- Decimal -> GMS sync (reverse: when map click updates tx_lat/tx_lon) ---
+// So clicking on the map also updates the GMS input fields.
+watch(
+  () => transmitter.tx_lat,
+  (val) => {
+    const g = decimalToGms(val);
+    lat_deg.value = g.deg;
+    lat_min.value = g.min;
+    lat_sec.value = g.sec;
+    lat_hemi.value = val >= 0 ? 'N' : 'S';
+  }
+);
+
+watch(
+  () => transmitter.tx_lon,
+  (val) => {
+    const g = decimalToGms(val);
+    lon_deg.value = g.deg;
+    lon_min.value = g.min;
+    lon_sec.value = g.sec;
+    lon_hemi.value = val <= 0 ? 'W' : 'E';
+  }
+);
+
+// --- Map draft pin sync (decimal watcher) ---
+// Typing coordinates moves the draggable draft pin. Skipped mid-simulation.
 watch(
   () => [Number(transmitter.tx_lat), Number(transmitter.tx_lon)] as const,
   ([lat, lon]) => {
@@ -125,7 +191,15 @@ watch(
   }
 );
 
+const centerMapOnTransmitter = () => {
+  if (!isNaN(transmitter.tx_lat) && !isNaN(transmitter.tx_lon)) {
+    store.getMap()?.flyTo({ center: [transmitter.tx_lon, transmitter.tx_lat] });
+  } else {
+    alert('Ingresa coordenadas de latitud y longitud validas.');
+  }
+};
+
 onMounted(() => {
-  store.initMap(); // Initialize the map
+  store.initMap();
 });
 </script>
