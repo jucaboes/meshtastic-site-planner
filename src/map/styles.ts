@@ -74,7 +74,9 @@ function raster(
   return { type: 'raster', tiles, tileSize, attribution, ...(maxzoom ? { maxzoom } : {}) };
 }
 
-export const DEFAULT_BASEMAP = 'Dark';
+// Colombia fork: default changed to Topographic (Esri, no API key required,
+// terrain shading visible — better for RF site planning than dark streets).
+export const DEFAULT_BASEMAP = 'Topographic';
 
 /** Stable id prefix for basemap sources/layers so they can be found+removed. */
 export const BASEMAP_PREFIX = 'basemap-';

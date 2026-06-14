@@ -45,7 +45,7 @@
           <input v-model.number="lon_sec" type="number" class="mt-input w-20 text-center" min="0" max="59.999" step="0.1" placeholder="''" title="Segundos (0-59.9)" />
           <span class="text-ink-muted text-sm">''</span>
           <select v-model="lon_hemi" class="mt-select w-16 text-center" title="Este u Oeste">
-            <option value="W">O</option>
+            <option value="W">W</option><!-- Colombia fork: W (internacional) en vez de O -->
             <option value="E">E</option>
           </select>
         </div>
